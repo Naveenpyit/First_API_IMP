@@ -53,7 +53,7 @@ class api_post():
             conn.commit()
             conn.close()
             cur.close()
-            return {"Success":"Data Submitted Successfully"}
+            return {"Message":"Data Submitted Successfully"}
         except Exception as err:
             return {"Error":str(err)}
 
