@@ -35,7 +35,7 @@ def ph_buss(request):
     try:
         file_path = os.path.join(settings.BASE_DIR, 'Datas_file', 'ph_business.txt')
         # print(f"file path:{file_path}")
-        if os.path.exists(file_path):
+        if os.path.exists(file_path) and os.path.getsize(file_path) > 0:
             with open(file_path, 'r') as file:
                 data = json.load(file)
             success_data = {
