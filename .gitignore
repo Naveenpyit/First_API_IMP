@@ -1,3 +1,4 @@
 .env
 authentication.py
 __pycache__/
+datas_file/

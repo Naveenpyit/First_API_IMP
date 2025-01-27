@@ -4,6 +4,10 @@ from django.http.response import JsonResponse
 from .authentication import apikeycheck
 from rest_framework.decorators import api_view,authentication_classes # type: ignore
 from rest_framework import status # type: ignore
+from .serializer import serialize_data
+import os
+import json
+from django.conf import settings
 
 @api_view(['GET'])
 @authentication_classes([apikeycheck])
@@ -28,22 +32,51 @@ def ph_prod_cat(request):
 @api_view(['GET'])
 @authentication_classes([apikeycheck])
 def ph_buss(request):
-    data=api_methods.get("Select * from ph_business")
+    try:
+        file_path = os.path.join(settings.BASE_DIR, 'Datas_file', 'ph_business.txt')
+        # print(f"file path:{file_path}")
+        if os.path.exists(file_path):
+            with open(file_path, 'r') as file:
+                data = json.load(file)
+            success_data = {
+                "Result": 1,
+                "Message": "Success",
+                "Api-result": data
+            }
+            return JsonResponse(success_data, safe=False, status=200)
 
-    if not data:
-        fail_data={
-            "Result":0,
-            "Message":"Fail",
-            "Api-result":"No records"
+        data = api_methods.get("Select * from ph_business")
+
+        if not data:
+            fail_data = {
+                "Result": 0,
+                "Message": "Fails to fetch",
+                "Api-result": "No Records!"
+            }
+            return JsonResponse(fail_data, safe=False, status=204)
+
+        if not os.path.exists(os.path.join(settings.BASE_DIR, 'Datas_file')):
+            os.makedirs(os.path.join(settings.BASE_DIR, 'Datas_file'))
+
+        serial_data = serialize_data.serial_data(data)
+
+        with open(file_path, 'w') as file:
+            json.dump(serial_data, file)  
+
+        success_data = {
+            "Result": 1,
+            "Message": "Success",
+            "Api-result": serial_data
         }
-        return JsonResponse(fail_data,safe=False,status=204)
-    
-    res_data={
-        "Result":1,
-        "Message":"Success",
-        "Api-result":data
-    }
-    return JsonResponse(res_data,safe=False,status=200)
+        return JsonResponse(success_data, safe=False, status=200)
+
+    except Exception as err:
+        return JsonResponse({
+            "Result": 0,
+            "Message": "Fail to fetch!",
+            "Api-result": str(err)
+        }, safe=False, status=500)
+
 
 @api_view(['POST'])
 @authentication_classes([apikeycheck])
