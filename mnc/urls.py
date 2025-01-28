@@ -9,4 +9,7 @@ urlpatterns=[
     path('putph-business/<int:code>/',views.put_ph_business,name='put-phbuss'),
     #delete
     path('delph-buss/<int:code>/',views.delete_ph_business,name='deldata'),
+    #model-post
+    path('model-master/',views.master_data,name='post-master'),
+    path('model-exam/',views.example_master,name='exam-mas'),
 ]

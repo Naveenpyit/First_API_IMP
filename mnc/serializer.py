@@ -1,4 +1,6 @@
 from datetime import date
+from .models import Master_Table_Lists,Example_master
+from rest_framework.serializers import ModelSerializer # type: ignore
 
 class serialize_data:
     @staticmethod
@@ -10,3 +12,14 @@ class serialize_data:
         elif isinstance(data, date):
             return data.isoformat()  
         return data
+
+class master_serial(ModelSerializer):
+    class Meta:
+        model=Master_Table_Lists
+        fields='__all__'
+
+
+class example_serial(ModelSerializer):  
+    class Meta:
+        model=Example_master
+        fields='__all__'     

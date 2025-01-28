@@ -4,10 +4,11 @@ from django.http.response import JsonResponse
 from .authentication import apikeycheck
 from rest_framework.decorators import api_view,authentication_classes # type: ignore
 from rest_framework import status # type: ignore
-from .serializer import serialize_data
+from .serializer import serialize_data,master_serial,example_serial
 import os
 import json
 from django.conf import settings
+from django.utils import timezone
 
 @api_view(['GET'])
 @authentication_classes([apikeycheck])
@@ -39,7 +40,7 @@ def ph_buss(request):
             with open(file_path, 'r') as file:
                 data = json.load(file)
             success_data = {
-                "Result": 1,
+                "Result": 1,    
                 "Message": "Success",
                 "Api-result": data
             }
@@ -61,7 +62,7 @@ def ph_buss(request):
         serial_data = serialize_data.serial_data(data)
 
         with open(file_path, 'w') as file:
-            json.dump(serial_data, file)  
+            json.dump(serial_data, file,indent=4)  
 
         success_data = {
             "Result": 1,
@@ -199,3 +200,61 @@ def delete_ph_business(request,code):
 
 
 
+
+@api_view(['POST'])
+@authentication_classes([apikeycheck])
+def master_data(request):
+    name=request.data.get('name')
+    lasupd=request.data.get('lasupd')
+    time=request.data.get('time')
+    newupd=request.data.get('newupd')
+
+    res={
+        'Table_Name':name,
+        'Last_Update':lasupd,
+        'Duration':time,
+        'New_Update':newupd
+    }
+
+    data_serializer = master_serial(data=res)
+    
+    try:
+        if data_serializer.is_valid():
+            data_serializer.save()  
+            return JsonResponse({"Message": "Data Submitted Successfully!", "data": data_serializer.data}, status=201)
+        else:
+            return JsonResponse({"Message": "Not Submitted", "Error": data_serializer.errors}, status=400)
+    except Exception as err:
+        return JsonResponse({"Message": "Error occurred", "Error": str(err)}, status=500)
+    
+
+
+
+@api_view(['POST'])
+@authentication_classes([apikeycheck])
+def example_master(request):
+    name=request.data.get('name')
+    # lasupd=request.data.get('lasupd')
+    time=request.data.get('time')
+    newupd=request.data.get('newupd')
+
+    current_time = timezone.now()
+    local_time=timezone.localtime(current_time)
+
+    res={
+        'Table_Name':name,
+        'Last_Update':local_time,
+        'Duration':time,
+        'New_Update':newupd
+    }
+
+    data_serializer = example_serial(data=res)
+    
+    try:
+        if data_serializer.is_valid():
+            data_serializer.save()  
+            return JsonResponse({"Message": "Data Submitted Successfully!", "data": data_serializer.data}, status=201)
+        else:
+            return JsonResponse({"Message": "Not Submitted", "Error": data_serializer.errors}, status=400)
+    except Exception as err:
+        return JsonResponse({"Message": "Error occurred", "Error": str(err)}, status=500)
