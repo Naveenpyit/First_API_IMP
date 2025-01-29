@@ -12,5 +12,8 @@ class Example_master(models.Model):
     Duration=models.CharField(max_length=3)
     New_Update=models.CharField(max_length=40)
 
-
-    
+class New_main_table(models.Model):
+    Table_Name=models.CharField(max_length=40)
+    Last_Update=models.DateTimeField(default=timezone.now)
+    Duration=models.CharField(max_length=3,default=2)
+    New_Update=models.CharField(max_length=3,default='No')

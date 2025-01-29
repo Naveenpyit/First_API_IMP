@@ -1,5 +1,5 @@
 from datetime import date
-from .models import Master_Table_Lists,Example_master
+from .models import Master_Table_Lists,Example_master,New_main_table
 from rest_framework.serializers import ModelSerializer # type: ignore
 
 class serialize_data:
@@ -23,3 +23,9 @@ class example_serial(ModelSerializer):
     class Meta:
         model=Example_master
         fields='__all__'     
+
+
+class main_serial(ModelSerializer):
+    class Meta:
+        model=New_main_table
+        fields='__all__'        
